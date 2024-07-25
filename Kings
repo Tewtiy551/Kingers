@@ -1,0 +1,157 @@
+local Kings = loadstring(game:HttpGet("https://raw.githubusercontent.com/iHavoc101/Genesis-Studios/main/UserInterface/Luminosity.lua", true))()
+
+local Window = Kings.new("Kings UI", "v1", 4370345701)
+
+local Tab1 = Window.Tab("Kinging", 6026568198)
+
+local ReachFolder = Tab1.Folder("Reach", "Starting reach is 0 (Q,E)")
+_G.Reach = 0
+_G.KeyBindHigher = Enum.KeyCode.Q
+_G.KeyBindLower = Enum.KeyCode.E
+_G.ReachEnabled = false
+
+ReachFolder.Switch("Reach", function(Status)
+    _G.ReachEnabled = Status
+end)
+
+ReachFolder.Toggle("Autoclicker", function(Status)
+    _G.AutoClicker = Status
+
+    if Status then
+        spawn(function()
+            while _G.AutoClicker do
+                wait()
+                pcall(function()
+                    local sword = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+                    if sword then
+                        sword:Activate()
+                    end
+                end)
+            end
+        end)
+    end
+end)
+
+ReachFolder.Toggle("Lock-On", function(Status)
+    _G.LockOnEnabled = Status
+end)
+
+local AutoKickFolder = Tab1.Folder("AutoKick", "Bound to J")
+_G.AutoKickEnabled = false
+
+local Tab2 = Window.Tab("Autofarm", 6026568198)  -- Update this ID as needed
+
+local AutofarmFolder = Tab2.Folder("Autofarm", "Auto Cube Farm")
+
+local TweenService = game:GetService("TweenService")
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+local isToggled = false
+
+-- Create the switch for Autofarm
+AutofarmFolder.Switch("Enable Autofarm", function(Status)
+    isToggled = Status
+    local message = isToggled and "Autofarm ON" or "Autofarm OFF"
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Notification",
+        Text = message,
+        Icon = "",
+        Duration = 1
+    })
+end)
+
+spawn(function()
+    while true do
+        wait(1)
+        if isToggled then
+            local Gifts = Workspace:FindFirstChild("Gifts")
+            local Structure = Workspace:FindFirstChild("Structure")
+            local Spawn = Structure and Structure:FindFirstChild("SpawnLocation")
+
+            if Gifts and Spawn then
+                for _, Time in pairs(Gifts:GetChildren()) do
+                    if Time:IsA("BasePart") and Time.Parent then
+                        local Distance = (Player.Character.HumanoidRootPart.Position - Time.Position).Magnitude
+                        local Speed = Distance / 55.1853812095451
+                        local Tween = TweenService:Create(Player.Character.HumanoidRootPart, TweenInfo.new(Speed, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {CFrame = Time.CFrame})
+                        Tween:Play()
+                        Tween.Completed:Wait()
+
+                        local SafeDistance = (Player.Character.HumanoidRootPart.Position - Spawn.Position).Magnitude
+                        local SafeSpeed = SafeDistance / 55
+                        local SafeTween = TweenService:Create(Player.Character.HumanoidRootPart, TweenInfo.new(SafeSpeed, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {CFrame = Spawn.CFrame * CFrame.new(0, 2.5, 0)})
+                        SafeTween:Play()
+                    end
+                end
+            end
+        end
+    end
+end)
+
+local function breakLimbs(player)
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        local limbs = {"Left Arm", "Left Leg", "Right Arm", "Right Leg"}
+        for _, limbName in ipairs(limbs) do
+            local limb = player.Character:FindFirstChild(limbName)
+            if limb then
+                limb:BreakJoints()
+                limb.Transparency = 1
+                limb.CanCollide = false
+                limb.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(1, 0, -3.5)
+            end
+        end
+    end
+end
+
+game:GetService("RunService").Stepped:Connect(function()
+    pcall(function()
+        local sword = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+        if sword and _G.ReachEnabled then
+            for _, player in ipairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Humanoid") then
+                    if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude <= _G.Reach then
+                        breakLimbs(player)
+                    end
+                end
+            end
+        end
+    end)
+end)
+
+local function getClosestPlayerWithinReach()
+    local closestPlayer = nil
+    local shortestDistance = _G.Reach
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local targetHRP = player.Character.HumanoidRootPart
+            local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - targetHRP.Position).Magnitude
+
+            local targetHumanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if targetHumanoid and targetHumanoid.Health > 0 and distance < shortestDistance then
+                closestPlayer = player
+                shortestDistance = distance
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+local function lockOnClosestPlayer()
+    if _G.LockOnEnabled then
+        local closestPlayer = getClosestPlayerWithinReach()
+        if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local targetHRP = closestPlayer.Character.HumanoidRootPart
+            local playerHRP = game.Players.LocalPlayer.Character.HumanoidRootPart
+            local direction = (Vector3.new(targetHRP.Position.X, playerHRP.Position.Y, targetHRP.Position.Z) - playerHRP.Position).unit
+            playerHRP.CFrame = CFrame.lookAt(playerHRP.Position, playerHRP.Position + direction)
+        end
+    end
+end
+
+game:GetService("RunService").RenderStepped:Connect(lockOnClosestPlayer)
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Tewtiy551/tewwwwwwwwwwwwwwww/main/tewwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", true))()
