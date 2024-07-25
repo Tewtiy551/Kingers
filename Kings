@@ -37,7 +37,7 @@ ReachFolder.Toggle("Lock-On", function(Status)
     _G.LockOnEnabled = Status
 end)
 
-local AutoKickFolder = Tab1.Folder("AutoKick", "")
+local AutoKickFolder = Tab1.Folder("AutoKick", "Bound to J")
 _G.AutoKickEnabled = false
 
 -- Autofarm Tab
