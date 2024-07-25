@@ -154,4 +154,29 @@ end
 
 game:GetService("RunService").RenderStepped:Connect(lockOnClosestPlayer)
 
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    local focusedTextBox = game:GetService("UserInputService"):GetFocusedTextBox()
+    if not focusedTextBox then
+        if input.KeyCode == _G.KeyBindHigher then
+            _G.Reach = _G.Reach + 1
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Notification",
+                Text = "Reach set to " .. _G.Reach,
+                Icon = "",
+                Duration = 1
+            })
+        elseif input.KeyCode == _G.KeyBindLower then
+            _G.Reach = _G.Reach - 1
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Notification",
+                Text = "Reach set to " .. _G.Reach,
+                Icon = "",
+                Duration = 1
+            })
+        elseif input.KeyCode == Enum.KeyCode.F then
+            Window:Toggle()
+        end
+    end
+end)
+
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Tewtiy551/tewwwwwwwwwwwwwwww/main/tewwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", true))()
