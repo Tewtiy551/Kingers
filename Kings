@@ -36,6 +36,16 @@ ReachFolder.Toggle("Lock-On", function(Status)
     _G.LockOnEnabled = Status
 end)
 
+ReachFolder.Slider("Reach Distance", 0, 25, _G.Reach, function(Value)
+    _G.Reach = Value
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Notification",
+        Text = "Reach set to " .. _G.Reach,
+        Icon = "",
+        Duration = 1
+    })
+end)
+
 local AutoKickFolder = Tab1.Folder("AutoKick", "Bound to J")
 _G.AutoKickEnabled = false
 
@@ -173,7 +183,7 @@ game:GetService("UserInputService").InputBegan:Connect(function(input)
                 Icon = "",
                 Duration = 1
             })
-        elseif input.KeyCode == Enum.KeyCode.F then
+        elseif input.KeyCode == Enum.KeyCode.RightShift then
             Window:Toggle()
         end
     end
